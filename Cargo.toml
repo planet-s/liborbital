@@ -1,0 +1,14 @@
+[package]
+name = "liborbital"
+version = "0.1.0"
+authors = ["Tibor Nagy <xnagytibor@gmail.com>"]
+
+[lib]
+name = "orbital"
+crate-type = ["staticlib"]
+
+[dependencies]
+orbclient = "0.3.13"
+
+[build-dependencies]
+cbindgen = "0.5.2"
