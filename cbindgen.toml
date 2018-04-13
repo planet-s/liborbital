@@ -4,3 +4,7 @@ header = "/* C bindings for the Orbital display server */"
 
 [export.rename]
 "Window" = "void"
+"EventIter" = "void"
+
+[enum]
+prefix_with_name = true

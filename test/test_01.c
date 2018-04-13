@@ -6,10 +6,11 @@
 #define HEIGHT 480
 
 int main() {
-    void *window = orb_window_new(10, 10, 320, 240, "Test window");
+    void *window = orb_window_new(10, 10, 640, 480, "Test window");
 
     orb_window_set_pos(window, 100, 100);
     orb_window_set_size(window, WIDTH, HEIGHT);
+    orb_window_sync(window);
 
     printf("Display size: (%d, %d)\n", orb_display_width(), orb_display_height());
     printf("Window size: (%d, %d)\n", orb_window_width(window), orb_window_height(window));
@@ -17,15 +18,19 @@ int main() {
 
     char title[1024] = { 0 };
     int frame_count = 0;
-    uint32_t *frame_data = orb_window_data(window);
+    bool quit = false;
 
-    while (true) {
+    while (!quit) {
         sprintf(title, "Frame #%d", frame_count);
         orb_window_set_title(window, title);
 
-        for (int y = 0; y < HEIGHT; ++y) {
-            for (int x = 0; x < WIDTH; ++x) {
-                frame_data[y * WIDTH + x] =
+        uint32_t *frame_data = orb_window_data(window);
+        int width = orb_window_width(window);
+        int height = orb_window_height(window);
+
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                frame_data[y * width + x] =
                     0xFF000000 |
                     (((x ^ y ^ frame_count) & 0xFF) << 16) |
                     ((y & 0xFF) << 8) |
@@ -35,6 +40,70 @@ int main() {
 
         orb_window_sync(window);
         ++frame_count;
+
+        // I have a feeling there's a memory leak here
+        void *event_iter = orb_window_events(window);
+        OrbEventOption oeo = orb_events_next(event_iter);
+
+        while (oeo.tag != OrbEventOption_None) {
+            switch (oeo.tag) {
+                case OrbEventOption_Key:
+                    printf("Key { character: %c, scancode: %d, pressed: %d }\n",
+                        oeo.key.character,
+                        oeo.key.scancode,
+                        oeo.key.pressed);
+                    break;
+                case OrbEventOption_Mouse:
+                    printf("Mouse { x: %d, y: %d }\n",
+                        oeo.mouse.x,
+                        oeo.mouse.y);
+                    break;
+                case OrbEventOption_Button:
+                    printf("Button { left: %d, middle: %d, right: %d }\n",
+                        oeo.button.left,
+                        oeo.button.middle,
+                        oeo.button.right);
+                    break;
+                case OrbEventOption_Scroll:
+                    printf("Scroll { x: %d, y: %d }\n",
+                        oeo.scroll.x,
+                        oeo.scroll.y);
+                    break;
+                case OrbEventOption_Quit:
+                    printf("Quit {  }\n");
+                    quit = true;
+                    break;
+                case OrbEventOption_Focus:
+                    printf("Focus { focused: %d }\n",
+                        oeo.focus.focused);
+                    break;
+                case OrbEventOption_Move:
+                    printf("Move { x: %d, y: %d }\n",
+                        oeo.move.x,
+                        oeo.move.y);
+                    break;
+                case OrbEventOption_Resize:
+                    printf("Resize { width: %d, height: %d }\n",
+                        oeo.resize.width,
+                        oeo.resize.height);
+                    break;
+                case OrbEventOption_Screen:
+                    printf("Screen { width: %d, height: %d }\n",
+                        oeo.screen.width,
+                        oeo.screen.height);
+                    break;
+                case OrbEventOption_Unknown:
+                    printf("Unknown { code: %ld, a: %ld, b: %ld }\n",
+                        oeo.unknown.code,
+                        oeo.unknown.a,
+                        oeo.unknown.b);
+                    break;
+                default:
+                    break;
+            }
+
+            oeo = orb_events_next(event_iter);
+        }
     }
 
     return 0;

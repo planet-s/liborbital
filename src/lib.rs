@@ -1,9 +1,73 @@
 extern crate orbclient;
 
-use orbclient::{Window, Renderer, get_display_size};
+use orbclient::{Window, WindowFlag, Renderer, EventIter, get_display_size};
 use std::os::raw::*;
 use std::mem::transmute;
 use std::ffi::CStr;
+
+use orbclient::event::*;
+
+/// Should be in sync with `orbclient::event::EventOption`
+#[repr(C)]
+pub enum OrbEventOption {
+    Key {
+        character: char,
+        scancode: u8,
+        pressed: bool,
+    },
+    Mouse {
+        x: i32,
+        y: i32,
+    },
+    Button {
+        left: bool,
+        middle: bool,
+        right: bool,
+    },
+    Scroll {
+        x: i32,
+        y: i32,
+    },
+    Quit {
+    },
+    Focus {
+        focused: bool,
+    },
+    Move {
+        x: i32,
+        y: i32,
+    },
+    Resize {
+        width: u32,
+        height: u32,
+    },
+    Screen {
+        width: u32,
+        height: u32,
+    },
+    Unknown {
+        code: i64,
+        a: i64,
+        b: i64,
+    },
+    None,
+}
+
+fn event_option_to_c(event_option: &EventOption) -> OrbEventOption {
+    match *event_option {
+        EventOption::Key(KeyEvent { character, scancode, pressed }) => OrbEventOption::Key { character, scancode, pressed },
+        EventOption::Mouse(MouseEvent { x, y }) => OrbEventOption::Mouse { x, y },
+        EventOption::Button(ButtonEvent { left, middle, right }) => OrbEventOption::Button { left, middle, right },
+        EventOption::Scroll(ScrollEvent { x, y }) => OrbEventOption::Scroll { x, y },
+        EventOption::Quit(QuitEvent { }) => OrbEventOption::Quit { },
+        EventOption::Focus(FocusEvent { focused }) => OrbEventOption::Focus { focused },
+        EventOption::Move(MoveEvent { x, y }) => OrbEventOption::Move { x, y },
+        EventOption::Resize(ResizeEvent { width, height }) => OrbEventOption::Resize { width, height },
+        EventOption::Screen(ScreenEvent { width, height }) => OrbEventOption::Screen { width, height },
+        EventOption::Unknown(Event { code, a, b }) => OrbEventOption::Unknown { code, a, b },
+        EventOption::None => OrbEventOption::None,
+    }
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn orb_display_width() -> u32 {
@@ -22,9 +86,9 @@ pub unsafe extern "C" fn orb_window_new(
     w: u32,
     h: u32,
     title: *const c_char,
-) ->  *mut Window {
+) -> *mut Window {
     let title = CStr::from_ptr(title).to_string_lossy();
-    transmute(Box::new(Window::new(x, y, w, h, &title).unwrap()))
+    transmute(Box::new(Window::new_flags(x, y, w, h, &title, &[WindowFlag::Async, WindowFlag::Resizable]).unwrap()))
 }
 
 #[no_mangle]
@@ -71,4 +135,18 @@ pub unsafe extern "C" fn orb_window_set_title(window: &mut Window, title: *const
 #[no_mangle]
 pub unsafe extern "C" fn orb_window_sync(window: &mut Window) {
     window.sync();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_window_events(window: &mut Window) -> *mut EventIter {
+    transmute(Box::new(window.events()))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_events_next(event_iter: &mut EventIter) -> OrbEventOption {
+    if let Some(event) = event_iter.next() {
+        event_option_to_c(&event.to_option())
+    } else {
+        OrbEventOption::None
+    }
 }
