@@ -6,7 +6,7 @@
 #define HEIGHT 480
 
 int main() {
-    void *window = orb_window_new(10, 10, 640, 480, "Test window");
+    void *window = orb_window_new_flags(10, 10, 640, 480, "Test window", ORB_WINDOW_ASYNC | ORB_WINDOW_RESIZABLE);
 
     orb_window_set_pos(window, 100, 100);
     orb_window_set_size(window, WIDTH, HEIGHT);
@@ -25,11 +25,11 @@ int main() {
         orb_window_set_title(window, title);
 
         uint32_t *frame_data = orb_window_data(window);
-        int width = orb_window_width(window);
-        int height = orb_window_height(window);
+        uint32_t width = orb_window_width(window);
+        uint32_t height = orb_window_height(window);
 
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
+        for (uint32_t y = 0; y < height; ++y) {
+            for (uint32_t x = 0; x < width; ++x) {
                 frame_data[y * width + x] =
                     0xFF000000 |
                     (((x ^ y ^ frame_count) & 0xFF) << 16) |
@@ -52,6 +52,11 @@ int main() {
                         oeo.key.character,
                         oeo.key.scancode,
                         oeo.key.pressed);
+
+                    if (oeo.key.scancode == ORB_KEY_ESC) {
+                        quit = true;
+                    }
+
                     break;
                 case OrbEventOption_Mouse:
                     printf("Mouse { x: %d, y: %d }\n",
@@ -70,7 +75,7 @@ int main() {
                         oeo.scroll.y);
                     break;
                 case OrbEventOption_Quit:
-                    printf("Quit {  }\n");
+                    printf("Quit { }\n");
                     quit = true;
                     break;
                 case OrbEventOption_Focus:

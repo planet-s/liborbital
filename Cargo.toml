@@ -11,4 +11,4 @@ crate-type = ["staticlib"]
 orbclient = "0.3.13"
 
 [build-dependencies]
-cbindgen = "0.5.2"
+cbindgen = { git = "https://github.com/eqrion/cbindgen" }

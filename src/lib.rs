@@ -1,13 +1,64 @@
 extern crate orbclient;
 
-use orbclient::{Window, WindowFlag, Renderer, EventIter, get_display_size};
-use std::os::raw::*;
-use std::mem::transmute;
 use std::ffi::CStr;
+use std::mem::transmute;
+use std::os::raw::c_char;
 
+use orbclient::{Window, WindowFlag, Renderer, EventIter, get_display_size};
 use orbclient::event::*;
 
-/// Should be in sync with `orbclient::event::EventOption`
+// Should be in sync with `orbclient::WindowFlag`
+pub const ORB_WINDOW_ASYNC: u32 = 0x0001;
+pub const ORB_WINDOW_BACK: u32 = 0x0002;
+pub const ORB_WINDOW_FRONT: u32 = 0x0004;
+pub const ORB_WINDOW_RESIZABLE: u32 = 0x0008;
+pub const ORB_WINDOW_UNCLOSABLE: u32 = 0x0010;
+
+// Should be in sync with `orbclient::event::K_*`
+pub const ORB_KEY_TICK: u8 = 0x29;
+pub const ORB_KEY_MINUS: u8 = 0x0C;
+pub const ORB_KEY_EQUALS: u8 = 0x0D;
+pub const ORB_KEY_BACKSLASH: u8 = 0x2B;
+pub const ORB_KEY_BRACE_OPEN: u8 = 0x1A;
+pub const ORB_KEY_BRACE_CLOSE: u8 = 0x1B;
+pub const ORB_KEY_SEMICOLON: u8 = 0x27;
+pub const ORB_KEY_QUOTE: u8 = 0x28;
+pub const ORB_KEY_COMMA: u8 = 0x33;
+pub const ORB_KEY_PERIOD: u8 = 0x34;
+pub const ORB_KEY_SLASH: u8 = 0x35;
+pub const ORB_KEY_BKSP: u8 = 0x0E;
+pub const ORB_KEY_SPACE: u8 = 0x39;
+pub const ORB_KEY_TAB: u8 = 0x0F;
+pub const ORB_KEY_CAPS: u8 = 0x3A;
+pub const ORB_KEY_LEFT_SHIFT: u8 = 0x2A;
+pub const ORB_KEY_RIGHT_SHIFT: u8 = 0x36;
+pub const ORB_KEY_CTRL: u8 = 0x1D;
+pub const ORB_KEY_ALT: u8 = 0x38;
+pub const ORB_KEY_ENTER: u8 = 0x1C;
+pub const ORB_KEY_ESC: u8 = 0x01;
+pub const ORB_KEY_F1: u8 = 0x3B;
+pub const ORB_KEY_F2: u8 = 0x3C;
+pub const ORB_KEY_F3: u8 = 0x3D;
+pub const ORB_KEY_F4: u8 = 0x3E;
+pub const ORB_KEY_F5: u8 = 0x3F;
+pub const ORB_KEY_F6: u8 = 0x40;
+pub const ORB_KEY_F7: u8 = 0x41;
+pub const ORB_KEY_F8: u8 = 0x42;
+pub const ORB_KEY_F9: u8 = 0x43;
+pub const ORB_KEY_F10: u8 = 0x44;
+pub const ORB_KEY_HOME: u8 = 0x47;
+pub const ORB_KEY_UP: u8 = 0x48;
+pub const ORB_KEY_PGUP: u8 = 0x49;
+pub const ORB_KEY_LEFT: u8 = 0x4B;
+pub const ORB_KEY_RIGHT: u8 = 0x4D;
+pub const ORB_KEY_END: u8 = 0x4F;
+pub const ORB_KEY_DOWN: u8 = 0x50;
+pub const ORB_KEY_PGDN: u8 = 0x51;
+pub const ORB_KEY_DEL: u8 = 0x53;
+pub const ORB_KEY_F11: u8 = 0x57;
+pub const ORB_KEY_F12: u8 = 0x58;
+
+// Should be in sync with `orbclient::event::EventOption`
 #[repr(C)]
 pub enum OrbEventOption {
     Key {
@@ -53,19 +104,43 @@ pub enum OrbEventOption {
     None,
 }
 
-fn event_option_to_c(event_option: &EventOption) -> OrbEventOption {
-    match *event_option {
-        EventOption::Key(KeyEvent { character, scancode, pressed }) => OrbEventOption::Key { character, scancode, pressed },
-        EventOption::Mouse(MouseEvent { x, y }) => OrbEventOption::Mouse { x, y },
-        EventOption::Button(ButtonEvent { left, middle, right }) => OrbEventOption::Button { left, middle, right },
-        EventOption::Scroll(ScrollEvent { x, y }) => OrbEventOption::Scroll { x, y },
-        EventOption::Quit(QuitEvent { }) => OrbEventOption::Quit { },
-        EventOption::Focus(FocusEvent { focused }) => OrbEventOption::Focus { focused },
-        EventOption::Move(MoveEvent { x, y }) => OrbEventOption::Move { x, y },
-        EventOption::Resize(ResizeEvent { width, height }) => OrbEventOption::Resize { width, height },
-        EventOption::Screen(ScreenEvent { width, height }) => OrbEventOption::Screen { width, height },
-        EventOption::Unknown(Event { code, a, b }) => OrbEventOption::Unknown { code, a, b },
-        EventOption::None => OrbEventOption::None,
+impl From<EventOption> for OrbEventOption {
+    fn from(event: EventOption) -> Self {
+        match event {
+            EventOption::Key(KeyEvent { character, scancode, pressed }) => {
+                OrbEventOption::Key { character, scancode, pressed }
+            },
+            EventOption::Mouse(MouseEvent { x, y }) => {
+                OrbEventOption::Mouse { x, y }
+            },
+            EventOption::Button(ButtonEvent { left, middle, right }) => {
+                OrbEventOption::Button { left, middle, right }
+            },
+            EventOption::Scroll(ScrollEvent { x, y }) => {
+                OrbEventOption::Scroll { x, y }
+            },
+            EventOption::Quit(QuitEvent { }) => {
+                OrbEventOption::Quit { }
+            },
+            EventOption::Focus(FocusEvent { focused }) => {
+                OrbEventOption::Focus { focused }
+            },
+            EventOption::Move(MoveEvent { x, y }) => {
+                OrbEventOption::Move { x, y }
+            },
+            EventOption::Resize(ResizeEvent { width, height }) => {
+                OrbEventOption::Resize { width, height }
+            },
+            EventOption::Screen(ScreenEvent { width, height }) => {
+                OrbEventOption::Screen { width, height }
+            },
+            EventOption::Unknown(Event { code, a, b }) => {
+                OrbEventOption::Unknown { code, a, b }
+            },
+            EventOption::None => {
+                OrbEventOption::None
+            },
+        }
     }
 }
 
@@ -87,8 +162,30 @@ pub unsafe extern "C" fn orb_window_new(
     h: u32,
     title: *const c_char,
 ) -> *mut Window {
+    orb_window_new_flags(x, y, w, h, title, 0)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_window_new_flags(
+    x: i32,
+    y: i32,
+    w: u32,
+    h: u32,
+    title: *const c_char,
+    flags: u32,
+) -> *mut Window {
+    let flags_vec = {
+        let mut res = Vec::new();
+        if flags & ORB_WINDOW_ASYNC != 0 { res.push(WindowFlag::Async); }
+        if flags & ORB_WINDOW_BACK != 0 { res.push(WindowFlag::Back); }
+        if flags & ORB_WINDOW_FRONT != 0 { res.push(WindowFlag::Front); }
+        if flags & ORB_WINDOW_RESIZABLE != 0 { res.push(WindowFlag::Resizable); }
+        if flags & ORB_WINDOW_UNCLOSABLE != 0 { res.push(WindowFlag::Unclosable); }
+        res
+    };
+
     let title = CStr::from_ptr(title).to_string_lossy();
-    transmute(Box::new(Window::new_flags(x, y, w, h, &title, &[WindowFlag::Async, WindowFlag::Resizable]).unwrap()))
+    transmute(Box::new(Window::new_flags(x, y, w, h, &title, &flags_vec).unwrap()))
 }
 
 #[no_mangle]
@@ -145,7 +242,7 @@ pub unsafe extern "C" fn orb_window_events(window: &mut Window) -> *mut EventIte
 #[no_mangle]
 pub unsafe extern "C" fn orb_events_next(event_iter: &mut EventIter) -> OrbEventOption {
     if let Some(event) = event_iter.next() {
-        event_option_to_c(&event.to_option())
+        OrbEventOption::from(event.to_option())
     } else {
         OrbEventOption::None
     }
