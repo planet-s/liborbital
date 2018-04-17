@@ -41,7 +41,6 @@ int main() {
         orb_window_sync(window);
         ++frame_count;
 
-        // I have a feeling there's a memory leak here
         void *event_iter = orb_window_events(window);
         OrbEventOption oeo = orb_events_next(event_iter);
 
@@ -109,7 +108,10 @@ int main() {
 
             oeo = orb_events_next(event_iter);
         }
+
+        orb_events_destroy(event_iter);
     }
 
+    orb_window_destroy(window);
     return 0;
 }

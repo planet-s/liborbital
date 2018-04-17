@@ -189,6 +189,12 @@ pub unsafe extern "C" fn orb_window_new_flags(
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn orb_window_destroy(window: &mut Window) {
+    let window: Box<Window> = transmute(window);
+    drop(window);
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn orb_window_data(window: &mut Window) ->  *mut u32 {
     window.data_mut().as_mut_ptr() as *mut u32
 }
@@ -246,4 +252,10 @@ pub unsafe extern "C" fn orb_events_next(event_iter: &mut EventIter) -> OrbEvent
     } else {
         OrbEventOption::None
     }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_events_destroy(event_iter: &mut EventIter) {
+    let event_iter: Box<EventIter> = transmute(event_iter);
+    drop(event_iter);
 }
