@@ -58,6 +58,46 @@ pub const ORB_KEY_DEL: u8 = 0x53;
 pub const ORB_KEY_F11: u8 = 0x57;
 pub const ORB_KEY_F12: u8 = 0x58;
 
+// These scancodes are missing from `orbclient`
+pub const ORB_KEY_INSERT: u8 = 0x52;
+pub const ORB_KEY_SCROLL: u8 = 0x46;
+pub const ORB_KEY_0: u8 = 0x0B;
+pub const ORB_KEY_1: u8 = 0x02;
+pub const ORB_KEY_2: u8 = 0x03;
+pub const ORB_KEY_3: u8 = 0x04;
+pub const ORB_KEY_4: u8 = 0x05;
+pub const ORB_KEY_5: u8 = 0x06;
+pub const ORB_KEY_6: u8 = 0x07;
+pub const ORB_KEY_7: u8 = 0x08;
+pub const ORB_KEY_8: u8 = 0x09;
+pub const ORB_KEY_9: u8 = 0x0A;
+pub const ORB_KEY_A: u8 = 0x1E;
+pub const ORB_KEY_B: u8 = 0x30;
+pub const ORB_KEY_C: u8 = 0x2E;
+pub const ORB_KEY_D: u8 = 0x20;
+pub const ORB_KEY_E: u8 = 0x12;
+pub const ORB_KEY_F: u8 = 0x21;
+pub const ORB_KEY_G: u8 = 0x22;
+pub const ORB_KEY_H: u8 = 0x23;
+pub const ORB_KEY_I: u8 = 0x17;
+pub const ORB_KEY_J: u8 = 0x24;
+pub const ORB_KEY_K: u8 = 0x25;
+pub const ORB_KEY_L: u8 = 0x26;
+pub const ORB_KEY_M: u8 = 0x32;
+pub const ORB_KEY_N: u8 = 0x31;
+pub const ORB_KEY_O: u8 = 0x18;
+pub const ORB_KEY_P: u8 = 0x19;
+pub const ORB_KEY_Q: u8 = 0x10;
+pub const ORB_KEY_R: u8 = 0x13;
+pub const ORB_KEY_S: u8 = 0x1F;
+pub const ORB_KEY_T: u8 = 0x14;
+pub const ORB_KEY_U: u8 = 0x16;
+pub const ORB_KEY_V: u8 = 0x2F;
+pub const ORB_KEY_W: u8 = 0x11;
+pub const ORB_KEY_X: u8 = 0x2D;
+pub const ORB_KEY_Y: u8 = 0x15;
+pub const ORB_KEY_Z: u8 = 0x2C;
+
 // Should be in sync with `orbclient::event::EventOption`
 #[repr(C)]
 pub enum OrbEventOption {
