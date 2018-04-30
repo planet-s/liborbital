@@ -2,6 +2,8 @@
 name = "liborbital"
 version = "0.1.0"
 authors = ["Tibor Nagy <xnagytibor@gmail.com>"]
+license-file = "LICENSE"
+readme = "README.md"
 
 [lib]
 name = "orbital"
@@ -11,4 +13,4 @@ crate-type = ["staticlib"]
 orbclient = "0.3.13"
 
 [build-dependencies]
-cbindgen = { git = "https://github.com/eqrion/cbindgen" }
+cbindgen = "0.6.0"

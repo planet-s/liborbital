@@ -1,6 +1,6 @@
 include_guard = "_ORBITAL_H"
 language = "C"
-header = "/* C bindings for the Orbital display server */"
+header = "/* C bindings to the Orbital client library */"
 
 [export.rename]
 "Window" = "void"
