@@ -10,7 +10,7 @@ name = "orbital"
 crate-type = ["staticlib"]
 
 [dependencies]
-orbclient = "0.3.13"
+orbclient = "0.3.18"
 
 [build-dependencies]
-cbindgen = "0.6.0"
+cbindgen = { git = "https://gitlab.redox-os.org/redox-os/cbindgen.git" }
