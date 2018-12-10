@@ -1,3 +1,4 @@
+sys_includes = ["stdbool.h"]
 include_guard = "_ORBITAL_H"
 language = "C"
 header = "/* C bindings to the Orbital client library */"
