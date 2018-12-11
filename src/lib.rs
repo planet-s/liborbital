@@ -102,7 +102,7 @@ pub const ORB_KEY_Z: u8 = 0x2C;
 #[repr(C)]
 pub enum OrbEventOption {
     Key {
-        character: char,
+        character: u32,
         scancode: u8,
         pressed: bool,
     },
@@ -148,7 +148,7 @@ impl From<EventOption> for OrbEventOption {
     fn from(event: EventOption) -> Self {
         match event {
             EventOption::Key(KeyEvent { character, scancode, pressed }) => {
-                OrbEventOption::Key { character, scancode, pressed }
+                OrbEventOption::Key { character: character as u32, scancode, pressed }
             },
             EventOption::Mouse(MouseEvent { x, y }) => {
                 OrbEventOption::Mouse { x, y }
