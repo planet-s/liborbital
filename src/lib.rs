@@ -110,6 +110,10 @@ pub enum OrbEventOption {
         x: i32,
         y: i32,
     },
+    MouseRelative {
+        dx: i32,
+        dy: i32,
+    },
     Button {
         left: bool,
         middle: bool,
@@ -136,6 +140,10 @@ pub enum OrbEventOption {
         width: u32,
         height: u32,
     },
+    Clipboard {
+        kind: u8,
+        size: usize,
+    },
     Unknown {
         code: i64,
         a: i64,
@@ -152,6 +160,9 @@ impl From<EventOption> for OrbEventOption {
             },
             EventOption::Mouse(MouseEvent { x, y }) => {
                 OrbEventOption::Mouse { x, y }
+            },
+            EventOption::MouseRelative(MouseRelativeEvent { dx, dy }) => {
+                OrbEventOption::MouseRelative { dx, dy }
             },
             EventOption::Button(ButtonEvent { left, middle, right }) => {
                 OrbEventOption::Button { left, middle, right }
@@ -173,6 +184,9 @@ impl From<EventOption> for OrbEventOption {
             },
             EventOption::Screen(ScreenEvent { width, height }) => {
                 OrbEventOption::Screen { width, height }
+            },
+            EventOption::Clipboard(ClipboardEvent { kind, size }) => {
+                OrbEventOption::Clipboard { kind, size }
             },
             EventOption::Unknown(Event { code, a, b }) => {
                 OrbEventOption::Unknown { code, a, b }
@@ -257,6 +271,21 @@ pub unsafe extern "C" fn orb_window_x(window: &mut Window) -> i32 {
 #[no_mangle]
 pub unsafe extern "C" fn orb_window_y(window: &mut Window) -> i32 {
     window.y()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_window_set_mouse_cursor(window: &mut Window, cursor: bool) {
+    window.set_mouse_cursor(cursor);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_window_set_mouse_grab(window: &mut Window, grab: bool) {
+    window.set_mouse_grab(grab);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn orb_window_set_mouse_relative(window: &mut Window, relative: bool) {
+    window.set_mouse_relative(relative);
 }
 
 #[no_mangle]
