@@ -1,6 +1,6 @@
 [package]
 name = "liborbital"
-version = "0.3.27"
+version = "0.3.29"
 authors = ["Tibor Nagy <xnagytibor@gmail.com>"]
 license-file = "LICENSE"
 readme = "README.md"
@@ -10,7 +10,7 @@ name = "orbital"
 crate-type = ["staticlib"]
 
 [dependencies]
-orbclient = "0.3.27"
+orbclient = "=0.3.29"
 
 [build-dependencies]
 cbindgen = { git = "https://gitlab.redox-os.org/redox-os/cbindgen.git" }

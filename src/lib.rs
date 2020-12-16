@@ -106,6 +106,9 @@ pub enum OrbEventOption {
         scancode: u8,
         pressed: bool,
     },
+    TextInput {
+        character: u32,
+    },
     Mouse {
         x: i32,
         y: i32,
@@ -144,6 +147,10 @@ pub enum OrbEventOption {
         kind: u8,
         size: usize,
     },
+    ClipboardUpdate,
+    Drop {
+        kind: u8,
+    },
     Unknown {
         code: i64,
         a: i64,
@@ -157,6 +164,9 @@ impl From<EventOption> for OrbEventOption {
         match event {
             EventOption::Key(KeyEvent { character, scancode, pressed }) => {
                 OrbEventOption::Key { character: character as u32, scancode, pressed }
+            },
+            EventOption::TextInput(TextInputEvent { character }) => {
+                OrbEventOption::TextInput { character: character as u32 }
             },
             EventOption::Mouse(MouseEvent { x, y }) => {
                 OrbEventOption::Mouse { x, y }
@@ -187,6 +197,12 @@ impl From<EventOption> for OrbEventOption {
             },
             EventOption::Clipboard(ClipboardEvent { kind, size }) => {
                 OrbEventOption::Clipboard { kind, size }
+            },
+            EventOption::ClipboardUpdate(ClipboardUpdateEvent) => {
+                OrbEventOption::ClipboardUpdate
+            },
+            EventOption::Drop(DropEvent { kind }) => {
+                OrbEventOption::Drop { kind }
             },
             EventOption::Unknown(Event { code, a, b }) => {
                 OrbEventOption::Unknown { code, a, b }
